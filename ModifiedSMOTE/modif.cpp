@@ -19,6 +19,7 @@ struct VDComparator {
 	}
 };
 
+
 vvd prodModifAllCluster(vvd dataset, int N, int numOfVars, int knn) {
 	#pragma region Declaration of vvds
 	vvd syntheticDatas;
@@ -152,9 +153,9 @@ vvd prodModif(vvd clusterDataset, int N, int numOfVars, int indexOfExemplar,int 
 	printDatas(paired); 
 
 
-	//Gets the 5 nearest neighbors of exemplar
-	vvd rank = rank5NearFromEx(paired, indexOfExemplar);
-	cout << "5 near from exemplar" << endl;
+	//Ranks all the EDs from the exemplar
+	vvd rank = rankFromExemplar(paired, indexOfExemplar);
+	cout << "EDs ranked from exemplar" << endl;
 	printDatas(rank);
 
 
@@ -353,4 +354,29 @@ vvd remove0Classes(vvd dataset) {
 		}
 	}
 	return dataset;
+}
+
+vvd rankFromExemplar(vvd pairedData, int indexOfExemplar) {
+	vvd ranked = pairedData;
+	indexOfExemplar += 8; //because index 8 and below are the actual data an not the eds
+	sort(ranked.begin(), ranked.end(), VDComparator(indexOfExemplar));
+	for (int i = 0; i < ranked.size(); i++) {
+		if (indexOfExemplar == 0) {
+			ranked[i].erase(ranked[i].begin() + 1,ranked[i].end());
+		}
+		else {
+			ranked[i].erase(ranked[i].begin()+8, ranked[i].end() - indexOfExemplar+8);
+			ranked[i].erase(ranked[i].begin()+9+indexOfExemplar, ranked[i].end());
+		}
+		for (int j = 8; j < ranked[i].size(); j++) {
+			if (j == indexOfExemplar)
+				continue;
+			//ranked[i][j] = 0;
+			//ranked[i].erase(ranked[i].begin() + j);
+
+		}
+	}
+
+
+	return ranked;
 }

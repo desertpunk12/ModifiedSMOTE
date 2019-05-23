@@ -24,3 +24,5 @@ vvd combineAllClusters(vvd, vvd, vvd);
 
 vvd remove0Classes(vvd);
 
+
+vvd rankFromExemplar(vvd,int);

@@ -15,7 +15,7 @@ vvvd getMinorityWithEDs(vvd);
 vvd allEDs(vvd, int);
 
 
-vvd produceSyntheticData(vvvd, int, int);
+vvd producedSyntheticData(vvvd, int, int);
 
 
 
@@ -26,3 +26,12 @@ vvd remove0Classes(vvd);
 
 
 vvd rankFromExemplar(vvd,int);
+
+vvd get4Neighbor(vvd, int);
+
+
+vvd removeExessDataFromPaired(vvd, int);
+
+vd getIndexOfRanksFromExemplar(vvd, int);
+
+vvd addIndexValueToVVD(vvd);

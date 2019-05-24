@@ -207,3 +207,12 @@ double r1ton(int n) {
 }
 
 
+double r1to4() {
+	return (rand() % 4) + 1;
+	//return 1;
+}
+
+
+double r0to3() {
+	return (rand() % 4);
+}

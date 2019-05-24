@@ -109,28 +109,31 @@ vvd prodModifAllCluster(vvd dataset, int N, int numOfVars, int knn) {
 	space;
 		
 	//Using cluster 8 for now for testign
-	vvd synthC8 = prodModif(cluster10, numSamplesC8, numOfVars,2,knn);
-
+	vvd synthC8 = prodModif(cluster8, numSamplesC8, numOfVars,2,knn);
+	cout << "Finally " << synthC8.size() << endl;
+	printDatas(synthC8);
 
 	//All clusters
-	/* 
 	space;
 	space;
 
-	vvd synthC9 = prodModif(cluster9, numSamplesC9, numOfVars);
-
+	vvd synthC9 = prodModif(cluster9, numSamplesC9, numOfVars,2,knn);
+	cout << "Finally " << synthC9.size() << endl;
+	printDatas(synthC9);
 	space;
 	space;
 
-	vvd synthC10 = prodModif(cluster10, numSamplesC10, numOfVars);
+	vvd synthC10 = prodModif(cluster10, numSamplesC10, numOfVars,6,knn);
+	cout << "Finally " << synthC10.size() << endl;
+	printDatas(synthC10);
 
 	vvd combined = combineAllClusters(synthC8, synthC9, synthC10);
 
 	syntheticDatas = combined;
 
-	*/
 
-	syntheticDatas = synthC8;
+	//syntheticDatas = synthC8;
+	
 	return syntheticDatas;
 }
 
@@ -143,67 +146,56 @@ vvd prodModif(vvd clusterDataset, int N, int numOfVars, int indexOfExemplar,int 
 		4. Move to the next in the rank
 		
 	*/
+	vvd producedSyntheticDatas;
+
+	cout << "cluster dataset" << endl;
+	//printDatas(clusterDataset);
 
 	//Computes the eucliedan distances
 	vvd eds = computeEDs(clusterDataset, numOfVars);
-	printDatas(eds);
+	//printDatas(eds);
 
 	//Paired the eculidean distaces with the actual data so that its easier to see and compare
 	vvd paired = pairMinorityAndEDs(clusterDataset, eds);
-	printDatas(paired); 
+	//printDatas(paired); 
 
 
 	//Ranks all the EDs from the exemplar
-	vvd rank = rankFromExemplar(paired, indexOfExemplar);
-	cout << "EDs ranked from exemplar" << endl;
-	printDatas(rank);
+	//vvd rank = rankFromExemplar(paired, indexOfExemplar);
+	paired = addIndexValueToVVD(paired);
+	//printDatas(paired);
+
+	vd rank = getIndexOfRanksFromExemplar(paired, indexOfExemplar);
+	//cout << "EDs ranked from exemplar" << endl;
+	//printDatas(rank);
+	
 
 
-/*
-	vvvd bottom5 = near5Neighbors(paired);
-	printDatas(bottom5);
-
-	vvd oversampled = computeExemplarNeighbors(paired,indexOfExemplar,knn);
-*/
-
-	//vvvd alleds = getMinorityWithEDs(paired);
-	//printDatas(bottom5);
-
-	//vd sumOfEDs = sumOfVVVDs(bottom5);
-	//vd sumOfEDs = sumOfVVVDs(alleds);
-	//cout << "\t\t\t\t\t\t\t";
-	//printDatas(sumOfEDs);
-
-	//vd neds = computeNEDs(sumOfEDs);
-	//printDatas(neds);
-
-	//vd rneds = computeRNEDs(neds);
-	//printDatas(rneds);
-
-	//vd wmatrix = computeWeightMatrix(rneds);
-	//printDatas(wmatrix);
-
-	//vd smotegenmatrix = computeSmoteGenerationMatrix(wmatrix, N);
-	//printDatas(smotegenmatrix);
-
-	//Rounded the SMOTE Generation Matrix to get the Ns of each
-	//minority data in consideration
-	//vd Ns = roundDatas(smotegenmatrix);
-	//printDatas(Ns);
+	//Loop Untill it reaches the number of produced syntethic data 
+	//	needed for the cluster
+	for (int i = 0; i < N; i++) {
+		int indexOfTheCurrentExemplar = rank[i%rank.size()];
+		//cout << "Index of Current Exempalar: " << indexOfTheCurrentExemplar << endl;
+		vvd n4 = get4Neighbor(paired, indexOfTheCurrentExemplar);
+		//printDatas(n4);
+		vd randOversample = n4[r0to3()];
+		vd exemplar = paired[indexOfTheCurrentExemplar];
+		vd synthetic;
+		for (int i = 0; i < numOfVars; i++) {
+			double value = exemplar[i] + (r0to1()*(randOversample[i] - exemplar[i]));
+			synthetic.push_back(value);
+		}
+		// 1. Find the 4 nearest neightbor of the exemplar
+		// 2. Select 1 random neighbor to be the basis for creating the new synthetic data
+		// 2.1. In creating synthetic data do
+		// 2.2	exemplarVariable+(r0to1()*(oversampleVar-exemplarVar))
+		// 3. change the exemplar to the next in rank
 
 
-//	vvd syntheticData = produceSyntheticData(bottom5,Ns);
+		producedSyntheticDatas.push_back(synthetic);
+	}
 
-	//TODO: Get the summations of the 5 nearest neghbors
-
-	//vvd syntheticWithoutV6 = produceSyntheticData(bottom5, N, numOfVars);
-	//printDatas(syntheticWithoutV6);
-
-	//vvd synthetic = addV6(syntheticWithoutV6);
-	//printDatas(synthetic);
-	//return syntheticWithoutV6;
-	return clusterDataset;
-	//return synthetic;
+	return producedSyntheticDatas;
 }
 
 //Pairs the minority data from their corresponding EDs
@@ -309,7 +301,7 @@ vd roundDatas(vd datas) {
 }
 
 //Produces Synthetic Data using Weighted SMOTE
-vvd produceSyntheticData(vvvd data, int N, int numOfVars) {
+vvd producedSyntheticData(vvvd data, int N, int numOfVars) {
 	vvd syntheticDatas;
 	for (int i = 0; i < N; i++) {
 		int r1t5 = min((int)data[i].size()-1,(int)r1to5());
@@ -358,25 +350,61 @@ vvd remove0Classes(vvd dataset) {
 
 vvd rankFromExemplar(vvd pairedData, int indexOfExemplar) {
 	vvd ranked = pairedData;
-	indexOfExemplar += 8; //because index 8 and below are the actual data an not the eds
+	int indexEDStarts = 8;
+	indexOfExemplar += indexEDStarts; //because index 8 and below are the actual data an not the eds
 	sort(ranked.begin(), ranked.end(), VDComparator(indexOfExemplar));
-	for (int i = 0; i < ranked.size(); i++) {
-		if (indexOfExemplar == 0) {
-			ranked[i].erase(ranked[i].begin() + 1,ranked[i].end());
+	ranked = removeExessDataFromPaired(ranked, indexOfExemplar);
+
+	return ranked;
+}
+
+vvd removeExessDataFromPaired(vvd paired, int indexOfImportantData) {
+	int indexEDStarts = 8;
+	for (int i = 0; i < paired.size(); i++) {
+		if (indexOfImportantData == indexEDStarts) {
+			paired[i].erase(paired[i].begin() + 1 + 8,paired[i].end());
 		}
 		else {
-			ranked[i].erase(ranked[i].begin()+8, ranked[i].end() - indexOfExemplar+8);
-			ranked[i].erase(ranked[i].begin()+9+indexOfExemplar, ranked[i].end());
-		}
-		for (int j = 8; j < ranked[i].size(); j++) {
-			if (j == indexOfExemplar)
-				continue;
-			//ranked[i][j] = 0;
-			//ranked[i].erase(ranked[i].begin() + j);
+			//left of exemplar deletion
+			paired[i].erase(paired[i].begin()+indexEDStarts, paired[i].begin() + indexOfImportantData  );
 
+			//right of exemplar deletion
+			paired[i].erase(paired[i].begin()+ indexEDStarts + 1, paired[i].end()-1);
 		}
 	}
 
+	return paired;
+}
 
-	return ranked;
+vvd get4Neighbor(vvd paired, int indexOfExemplar) {
+	vvd n4 = paired;
+	int indexEDStarts = 8;
+	sort(n4.begin(), n4.end(), VDComparator(indexOfExemplar+indexEDStarts));
+	n4.erase(n4.begin());
+	return n4;
+}
+
+
+
+vd getIndexOfRanksFromExemplar(vvd paired, int indexOfExemplar) {
+	vd ranks;
+
+	int indexEDStarts = 8;
+	indexOfExemplar += indexEDStarts; //because index 8 and below are the actual data an not the eds
+	sort(paired.begin(), paired.end(), VDComparator(indexOfExemplar));
+	
+	for (int i = 0; i < paired.size(); i++) {
+		ranks.push_back(paired[i][paired[i].size() - 1]);
+	}
+
+	return ranks;
+}
+
+
+vvd addIndexValueToVVD(vvd paired) {
+	for (int i = 0; i < paired.size(); i++) {
+		paired[i].push_back(i);
+	}
+
+	return paired;
 }

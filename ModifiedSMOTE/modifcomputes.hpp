@@ -49,3 +49,10 @@ double r1to5();
 
 //Generates random number from 1 to 5
 double r1ton(int);
+
+//Generates random number from 1 to 4
+double r1to4();
+
+
+//Generates random number from 1 to 4
+double r0to3();

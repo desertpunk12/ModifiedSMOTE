@@ -6,32 +6,33 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <map>
 
-//TODO: the link error was in function prodModif()
-
-
-//Useda a comparator for sorting vd datas
-struct VDComparator {
-	int indexCriteria;
-	VDComparator(int indexCriteria) { this->indexCriteria = indexCriteria; }
-	bool operator () (vd a, vd b) {
-		return a[indexCriteria] < b[indexCriteria];
-	}
-};
 
 
 vvd prodModifAllCluster(vvd dataset, int N, int numOfVars, int knn) {
+
 	#pragma region Declaration of vvds
 	vvd syntheticDatas;
+
+	//Map of clusters key: cluster number, value: datas associated by the cluster
+	map<int, vvd> clusters;
+	//Map of Sparsity Factors key: cluster number, value: Sparsity Factor associated by each cluster
+	map<int, double> sparFCs;
+	//Map of Sampling Weights key: cluster number, value: Samplign Weights associated by each cluster
+	map<int, double> samplWs;
+
 	vvd cluster8;
 	vvd cluster9;
 	vvd cluster10;
 	#pragma endregion
 			
 
-	#pragma region Remove class with 0 as value
-	dataset = remove0Classes(dataset);
+	int indexOfClass = numOfVars + 1;
+	int indexOfCluster = indexOfClass + 1;
 
+	#pragma region Remove class with 0 as value
+	dataset = remove0Classes(dataset,indexOfClass);
 	/*
 	cout << "Removed classes with 0 as values" << endl;
 	cout << "---------------------------------------------------------" << endl;
@@ -39,29 +40,38 @@ vvd prodModifAllCluster(vvd dataset, int N, int numOfVars, int knn) {
 	*/
 	#pragma endregion
 
-	#pragma region Separate each cluster and put in to teach vvd
+	#pragma region Separate each cluster and put in to each vvd
+
 	for (int i = 0; i < dataset.size(); i++) {
-		if (dataset[i][7] == 8)
-			cluster8.push_back(dataset[i]);
-		else if (dataset[i][7] == 9)
-			cluster9.push_back(dataset[i]);
-		else if (dataset[i][7] == 10)
-			cluster10.push_back(dataset[i]);
+		int cc = dataset[i][indexOfCluster];
+		auto xc = clusters.find(cc);
+		if (xc == clusters.end()) {
+			std::cout << "cluster does not exist not creating cluster: " << cc << endl;
+			vvd ddtt;
+			ddtt.push_back(dataset[i]);
+			clusters.insert(pair<int,vvd>(cc,ddtt) );
+		}
+		else {
+			xc->second.push_back(dataset[i]);
+		}
 	}
 
-	/*
-	cout << "Separated each cluster" << endl;
-	cout << "---------------------------------------------------------" << endl;
-	cout << "Cluster 8" << endl;
-	printDatas(cluster8);
-	cout << "Cluster 9" << endl;
-	printDatas(cluster9);
-	cout << "Cluster 10" << endl;
-	printDatas(cluster10);
-	*/
+	printDatas(clusters);
+
 	#pragma endregion 
 
+
 	#pragma region Computes Sparsity Factor of each Cluster
+	for (auto itr = clusters.begin(); itr != clusters.end(); ++itr) {
+		double spf = computeClusterSparsityFactor(itr->second, numOfVars);
+		sparFCs.insert(pair<int, double>(itr->first, spf));
+	}
+
+	//Prints all the sparsity factors of each cluster
+	for (auto itr = sparFCs.begin(); itr != sparFCs.end(); ++itr) {
+		cout << "Cluster: " << itr->first << "\t, Sparsity: " << itr->second << endl;
+	}
+
 	double sparFC8 = computeClusterSparsityFactor(cluster8, numOfVars);
 	double sparFC9 = computeClusterSparsityFactor(cluster9, numOfVars);
 	double sparFC10 = computeClusterSparsityFactor(cluster10, numOfVars);
@@ -73,15 +83,28 @@ vvd prodModifAllCluster(vvd dataset, int N, int numOfVars, int knn) {
 	#pragma endregion
 
 	#pragma region Computes Sparsity Sum of all Cluster
-	double sparSum = sparFC8 + sparFC9 + sparFC10;
-	//cout << "Sparsity Sum : " << sparSum << endl;
+	//double sparSum = sparFC8 + sparFC9 + sparFC10;
+	double sparSum = 0;
+	for (auto itr = sparFCs.begin(); itr != sparFCs.end(); ++itr) {
+		sparSum += itr->second;
+	}
+	cout << "Sparsity Sum : " << sparSum << endl;
 	
 	#pragma endregion
 
 	#pragma region Computes Sparsity Weight of each Cluster
+	for (auto itr = sparFCs.begin(); itr != sparFCs.end(); ++itr) {
+		double spw = itr->second / sparSum;
+		samplWs.insert(pair<int, double>(itr->first, spw));
+	}
+
 	double samplingWeightC8 = sparFC8 / sparSum;
 	double samplingWeightC9 = sparFC9 / sparSum;
 	double samplingWeightC10 = sparFC10 / sparSum;
+
+	for (auto itr = samplWs.begin(); itr != samplWs.end(); ++itr) {
+		cout << "Cluster: " << itr->first << "\t, SamplingWeight: " << itr->second << endl;
+	}
 	/*
 	cout << "Sampling Weights    ";
 	cout << samplingWeightC8 << " || ";
@@ -110,22 +133,22 @@ vvd prodModifAllCluster(vvd dataset, int N, int numOfVars, int knn) {
 		
 	//Using cluster 8 for now for testign
 	vvd synthC8 = prodModif(cluster8, numSamplesC8, numOfVars,2,knn);
-	cout << "Finally " << synthC8.size() << endl;
-	printDatas(synthC8);
+	//cout << "Finally " << synthC8.size() << endl;
+	//printDatas(synthC8);
 
 	//All clusters
 	space;
 	space;
 
 	vvd synthC9 = prodModif(cluster9, numSamplesC9, numOfVars,2,knn);
-	cout << "Finally " << synthC9.size() << endl;
-	printDatas(synthC9);
+	//cout << "Finally " << synthC9.size() << endl;
+	//printDatas(synthC9);
 	space;
 	space;
 
 	vvd synthC10 = prodModif(cluster10, numSamplesC10, numOfVars,6,knn);
-	cout << "Finally " << synthC10.size() << endl;
-	printDatas(synthC10);
+	//cout << "Finally " << synthC10.size() << endl;
+	//printDatas(synthC10);
 
 	vvd combined = combineAllClusters(synthC8, synthC9, synthC10);
 
@@ -133,7 +156,6 @@ vvd prodModifAllCluster(vvd dataset, int N, int numOfVars, int knn) {
 
 
 	//syntheticDatas = synthC8;
-	
 	return syntheticDatas;
 }
 
@@ -148,7 +170,7 @@ vvd prodModif(vvd clusterDataset, int N, int numOfVars, int indexOfExemplar,int 
 	*/
 	vvd producedSyntheticDatas;
 
-	cout << "cluster dataset" << endl;
+	//cout << "cluster dataset" << endl;
 	//printDatas(clusterDataset);
 
 	//Computes the eucliedan distances
@@ -337,9 +359,8 @@ vvd combineAllClusters(vvd c8, vvd c9, vvd c10) {
 
 
 //Removes rows with 0 class values
-vvd remove0Classes(vvd dataset) {
+vvd remove0Classes(vvd dataset,int indexOfClass) {
 	for(int i = 0; i < dataset.size(); i++){
-		int indexOfClass = 5;
 		if (dataset[i][indexOfClass] == 0) {
 			dataset.erase(dataset.begin() + i);
 			i--;
@@ -407,4 +428,34 @@ vvd addIndexValueToVVD(vvd paired) {
 	}
 
 	return paired;
+}
+
+class Cluster {
+public:
+	void tt();
+};
+
+map<int, Cluster*> generateClusters(vvd dataset, int ciOfCluster) {
+	map<int, Cluster*> clusters;
+	for (int i = 0; i < dataset.size(); i++) {
+		int cc = dataset[i][ciOfCluster];
+		auto xc = clusters.find(cc);
+		if (xc == clusters.end()) {
+			vvd ddtt;
+			ddtt.push_back(dataset[i]);
+			// ddtt.p
+			Cluster *clust = new Cluster();
+			clusters.insert(make_pair(cc, clust));
+		}
+		else {
+			// xc->second->tt();
+			//xc->second.push_back(dataset[i]);
+		}
+	}
+
+	for (const auto &cluster : clusters) {
+
+	}
+
+	return clusters;
 }

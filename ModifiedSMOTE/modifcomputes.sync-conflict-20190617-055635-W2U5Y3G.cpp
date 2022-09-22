@@ -76,7 +76,6 @@ vvd computeEDs(vvd minortyData, int numOfVars) {
 	for (int i = 0; i < minortyData.size(); i++) {
 		vd dd;
 		for (int j = 0; j < minortyData.size(); j++) {
-			//Condition to skip checking the distance to itself
 			if (i == j) {
 				dd.push_back(0);
 				continue;
@@ -101,37 +100,37 @@ double computeED(vd a, vd b, int numOfVars) {
 
 double computeClusterSparsityFactor(vvd data, int numOfVars) {
 
+	//Gets the minority data
+	vvd minority = getMinority(data, 5);
+	//printDatas(minority);
+
 
 	//Computes the eucliedan distances
-	vvd eds = computeEDs(data, numOfVars);
+	vvd eds = computeEDs(minority, numOfVars);
 	//printDatas(eds);
 
 	//Computes the average eculidean distance of all eds
-	double avgED = computeAverageED(eds);
-	//cout << "Average ED:" << avgED << endl;
+	double avgED = computeAverageED(eds, 5);
 
 	//Computes the density factor
-	double densityFactor = computeDensityFactor(avgED, eds.size(), numOfVars);
+	double densityFactor = computeDensityFactor(avgED, eds.size(), 5);
 
 	double sparsityFactor = computeSparsityFactor(densityFactor);
 
 	return sparsityFactor;
 }
 
-double computeAverageED(vvd EDs) {
+double computeAverageED(vvd EDs, int numOfVars) {
 	vd avgForEachVar;
 	// Compute average of each variables
-	for (int i = 0; i < EDs.size(); i++) {
+	for (int i = 0; i < numOfVars; i++) {
 		double x = 0;
 		for(int j = 0; j < EDs[i].size(); j++) {
 			x += EDs[i][j];
 		}
-		double y = x / (EDs[i].size()-1);
+		double y = x / EDs[i].size();
 		avgForEachVar.push_back(y);
 	}
-	
-	//cout << "Average for each var " << endl;
-	//printDatas(avgForEachVar);
 
 	double ss = 0;
 	// Compute average of all variable
@@ -207,12 +206,3 @@ double r1ton(int n) {
 }
 
 
-double r1to4() {
-	return (rand() % 4) + 1;
-	//return 1;
-}
-
-
-double r0to3() {
-	return (rand() % 4);
-}

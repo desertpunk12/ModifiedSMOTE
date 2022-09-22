@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <map>
 
 using namespace std;
 
@@ -23,6 +24,7 @@ void printDatas(vvs);
 void printDatas(vd);
 void printDatas(vvd);
 void printDatas(vvvd);
+void printDatas(map<int, vvd>);
 
 void csvExporter(string, vvd);
 

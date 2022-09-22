@@ -6,28 +6,26 @@
 #include "modif.hpp"
 #include <cstring>
 #include <cstdlib>
-#include <map>
-#include <iterator>
 
 using namespace std;
 
 
 int main(int argc, char **argv) {
-	
-	int N = 114;
+
+	int N = 116;
 
 	//Initialize random seed
 	srand(5);
 		
 	//Location of the dataset
+		
 	string fileData;
 	if (argc > 1 && string(argv[1]) == string("d")) {
 		fileData = "clustered_sampledata.csv";
 		if (argc > 2)
 			N = atoi(argv[2]);
 	}else
-		//fileData = "new_datasets/clustered_sampledata.csv";
-		fileData = "new_datasets/clustered_sampledata.csv";
+		fileData = "clustered_sampledata.csv";
 		
 	//Reads the file of dataset and stores it in vector
 	vvs datasetRaw = getData(fileData);
@@ -36,19 +34,15 @@ int main(int argc, char **argv) {
 	//Convert raw string data to double skip the first index becuase its the label
 	vvd dataset = vvsTovvd(datasetRaw,1);
 	//printDatas(dataset);
-	
-	//Get the number of vars
-	int numOfVars = dataset[0][0];
-	//cout << "Num of Vars:" << numOfVars << endl;
 
-	//The KNN
-	int knn = 4;
-
-	vvd datasetSynthetic = prodModifAllCluster(dataset,N,numOfVars,knn);
-	//cout << "DOOOOONNNNEEEE size :" << datasetSynthetic.size() << endl;
-	//printDatas(datasetSynthetic);
+	vvd datasetSynthetic = prodModifAllCluster(dataset,N,5,4);
 	space;
 	space;
+	space;
+	space;
+	space;
+	space;
+	printDatas(datasetSynthetic);
 	string fname = "Synthetic_Data_of_Modif.csv";
 	csvExporter(fname, datasetSynthetic);
 
@@ -102,7 +96,7 @@ vs splitLines(string line, char delimiter){
 	return x;
 }
 
-//Prints vvs datas
+
 void printDatas(vvs datas){
 	for (int i = 0; i < datas.size(); i++) {
 		for (int j = 0; j < datas[i].size(); j++) {
@@ -143,18 +137,10 @@ void printDatas(vd datas) {
 }
 
 
-void printDatas(map<int, vvd> datas) {
-	for (auto itr = datas.begin(); itr != datas.end(); ++itr) {
-		cout << "Clutster: " << itr->first << endl;
-		printDatas(itr->second);
-		space;
-	}
-}
-
 
 void csvExporter(string fname,vvd data) {
 	ofstream outFile(fname);
-	outFile << "v1,v2,v3,v4,v5" << endl;
+	outFile << "v1,v2,v3,v4,v5,v6" << endl;
 	for (int i = 0; i < data.size(); i++) {
 		for (int j = 0; j < data[i].size(); j++) {
 			outFile << data[i][j];

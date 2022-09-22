@@ -2,16 +2,6 @@
 #include "modif.hpp"
 #include "mmain.hpp"
 
-//Used a comparator for sorting vd datas
-struct VDComparator {
-	int indexCriteria;
-	VDComparator(int indexCriteria) { this->indexCriteria = indexCriteria; }
-	bool operator () (vd a, vd b) {
-		return a[indexCriteria] < b[indexCriteria];
-	}
-};
-
-
 
 //Returns the summation of 5 nearest neighbors of each variable
 vd sumOfVVVDs(vvvd);
@@ -33,7 +23,7 @@ double computeED(vd, vd, int);
 double computeClusterSparsityFactor(vvd, int);
 
 //Computer the average Eculidean Distance
-double computeAverageED(vvd);
+double computeAverageED(vvd, int);
 
 
 //Computes the what??
@@ -59,10 +49,3 @@ double r1to5();
 
 //Generates random number from 1 to 5
 double r1ton(int);
-
-//Generates random number from 1 to 4
-double r1to4();
-
-
-//Generates random number from 1 to 4
-double r0to3();

@@ -71,7 +71,10 @@ vd computeSmoteGenerationMatrix(vd wmatrix, int N) {
 
 
 
-vvd computeEDs(vvd minortyData, int numOfVars) {
+vvd computeEDs(vvd minortyData, int numOfVars,int startIndexOfDatas) {
+
+	// cout << "Minorty Data" << endl;
+	// printDatas(minortyData);
 	vvd distances;
 	for (int i = 0; i < minortyData.size(); i++) {
 		vd dd;
@@ -81,17 +84,17 @@ vvd computeEDs(vvd minortyData, int numOfVars) {
 				dd.push_back(0);
 				continue;
 			}
-			dd.push_back(computeED(minortyData[i], minortyData[j], numOfVars));
+			dd.push_back(computeED(minortyData[i], minortyData[j], numOfVars, startIndexOfDatas));
 		}
 		distances.push_back(dd);
 	}
 	return distances;
 }
 
-double computeED(vd a, vd b, int numOfVars) {
+double computeED(vd a, vd b, int numOfVars,int indexOfStartOfData) {
 	double res;
 	double sum = 0;
-	for (int i = 0; i < numOfVars; i++) {
+	for (int i = indexOfStartOfData; i < numOfVars; i++) {
 		sum += pow(a[i] - b[i], 2);
 	}
 	res = sqrt(sum);
@@ -99,12 +102,13 @@ double computeED(vd a, vd b, int numOfVars) {
 }
 
 
-double computeClusterSparsityFactor(vvd data, int numOfVars) {
+double computeClusterSparsityFactor(vvd data, int numOfVars, int startIndexOfDatas) {
 
 
 	//Computes the eucliedan distances
-	vvd eds = computeEDs(data, numOfVars);
-	//printDatas(eds);
+	vvd eds = computeEDs(data, numOfVars, startIndexOfDatas);
+	cout << "EDS:" << endl;
+	printDatas(eds);
 
 	//Computes the average eculidean distance of all eds
 	double avgED = computeAverageED(eds);

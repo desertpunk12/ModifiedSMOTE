@@ -24,13 +24,13 @@ vd computeSmoteGenerationMatrix(vd, int);
 
 
 //Computes a row of Euclidean Distances
-vvd computeEDs(vvd, int);
+vvd computeEDs(vvd, int, int);
 
 //Computes a single Euclidean Distance
-double computeED(vd, vd, int);
+double computeED(vd, vd, int, int);
 
 //Computes the sparsity factor of given cluster
-double computeClusterSparsityFactor(vvd, int);
+double computeClusterSparsityFactor(vvd, int, int);
 
 //Computer the average Eculidean Distance
 double computeAverageED(vvd);

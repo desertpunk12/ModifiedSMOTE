@@ -44,7 +44,8 @@ int main(int argc, char **argv) {
 	//Get the number of vars
 	int numOfVars = dataset[0][0];
 	// cout << "Num of Vars:" << numOfVars << endl;
-
+	int startIndexOfDatas = 2;
+	
 	int indexOfClass = 7;
 
 	int indexOfCluster = 8;
@@ -52,7 +53,7 @@ int main(int argc, char **argv) {
 	//The KNN
 	int knn = 4;
 
-	vvd datasetSynthetic = prodModifAllCluster(dataset,N,numOfVars, indexOfClass, indexOfCluster,knn);
+	vvd datasetSynthetic = prodModifAllCluster(dataset,N,numOfVars, startIndexOfDatas, indexOfClass, indexOfCluster,knn);
 	//cout << "DOOOOONNNNEEEE size :" << datasetSynthetic.size() << endl;
 	//printDatas(datasetSynthetic);
 	space;

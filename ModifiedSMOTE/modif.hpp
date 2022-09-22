@@ -2,8 +2,8 @@
 
 #include "mmain.hpp"
 
-vvd prodModif(vvd, int, int, int, int);
-vvd prodModifAllCluster(vvd, int, int, int, int, int);
+vvd prodModif(vvd, int, int, int, int, int);
+vvd prodModifAllCluster(vvd, int, int, int, int, int, int);
 
 vvd pairMinorityAndEDs(vvd, vvd);
 vvvd near5Neighbors(vvd);

@@ -9,7 +9,7 @@
 #include <map>
 
 
-vvd prodModifAllCluster(vvd dataset, int N, int numOfVars,int indexOfClass, int indexOfCluster, int knn)
+vvd prodModifAllCluster(vvd dataset, int N, int numOfVars,int startIndexOfDatas, int indexOfClass, int indexOfCluster, int knn)
 {
 #pragma region Declaration of vvds
     vvd syntheticDatas;
@@ -69,16 +69,16 @@ vvd prodModifAllCluster(vvd dataset, int N, int numOfVars,int indexOfClass, int 
 #pragma region Computes Sparsity Factor of each Cluster
     for (auto itr = clusters.begin(); itr != clusters.end(); ++itr)
     {
-        double spf = computeClusterSparsityFactor(itr->second, numOfVars);
+        double spf = computeClusterSparsityFactor(itr->second, numOfVars, startIndexOfDatas);
         sparFCs.insert(pair<int, double>(itr->first, spf));
         cout << "Cluster: " << itr->first << "\t, Sparsity: " << spf << endl;
     }
 
     //Prints all the sparsity factors of each cluster
-    // for (auto itr = sparFCs.begin(); itr != sparFCs.end(); ++itr)
-    // {
-    //     cout << "Cluster: " << itr->first << "\t, Sparsity: " << itr->second << endl;
-    // }
+    for (auto itr = sparFCs.begin(); itr != sparFCs.end(); ++itr)
+    {
+        cout << "Cluster: " << itr->first << "\t, Sparsity: " << itr->second << endl;
+    }
 
     //double sparFC8 = computeClusterSparsityFactor(cluster8, numOfVars);
     // double sparFC9 = computeClusterSparsityFactor(cluster9, numOfVars);
@@ -173,7 +173,7 @@ vvd prodModifAllCluster(vvd dataset, int N, int numOfVars,int indexOfClass, int 
     return syntheticDatas;
 }
 
-vvd prodModif(vvd clusterDataset, int N, int numOfVars, int indexOfExemplar, int knn)
+vvd prodModif(vvd clusterDataset, int N, int numOfVars, int startIndexOfDatas,int indexOfExemplar, int knn)
 {
     /*
         1. Rank nearest neighbors of exemplar
@@ -189,8 +189,8 @@ vvd prodModif(vvd clusterDataset, int N, int numOfVars, int indexOfExemplar, int
     //printDatas(clusterDataset);
 
     //Computes the eucliedan distances
-    vvd eds = computeEDs(clusterDataset, numOfVars);
-    //printDatas(eds);
+    vvd eds = computeEDs(clusterDataset, numOfVars, startIndexOfDatas);
+
 
     //Paired the eculidean distaces with the actual data so that its easier to see and compare
     vvd paired = pairMinorityAndEDs(clusterDataset, eds);

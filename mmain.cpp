@@ -113,7 +113,7 @@ void printDatas(vvd datas) {
 						for (int i = 0; i < datas.size(); i++) {
 								for (int j = 0; j < datas[i].size(); j++) {
 										// cout << datas[i][j] << "\t\t\t";
-									printf("%0.4f\t", datas[i][j]);
+									printf("%0.2f\t", datas[i][j]);
 								}
 								cout << endl;
 						}
@@ -133,7 +133,7 @@ void printDatas(vvvd datas) {
 void printDatas(vd datas) {
 						for (int i = 0; i < datas.size(); i++) {
 								// cout << datas[i] << "\t\t\t";
-									printf("%0.4f\t", datas[i]);
+									printf("%0.2f\t", datas[i]);
 						}
 						space;
 }

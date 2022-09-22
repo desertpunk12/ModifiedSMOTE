@@ -105,10 +105,10 @@ vvd prodModifAllCluster(vvd dataset, int N, int numOfVars, int knn) {
 	int numSamplesC8 = round(N * samplingWeightC8);
 	cout << "Number of Samples    ";
 	cout << "N: " << N << "  :  ";
-	cout << numSamplesC5 << " || ";
-	cout << numSamplesC6 << " || ";
-	cout << numSamplesC7 << " || ";
-	cout << numSamplesC8;
+	cout << "Cluster5:" << numSamplesC5 << " || ";
+	cout << "Cluster6:" << numSamplesC6 << " || ";
+	cout << "Cluster7:" << numSamplesC7 << " || ";
+	cout << "Cluster8:" << numSamplesC8;
 	cout << "    Total: " << numSamplesC5 + numSamplesC6 + numSamplesC7 + numSamplesC8;
 #pragma endregion
 

@@ -14,6 +14,7 @@ using namespace std;
 
 int main(int argc, char **argv) {
 	
+	// int N = 146;
 	int N = 114;
 
 	//Initialize random seed
@@ -25,9 +26,12 @@ int main(int argc, char **argv) {
 		fileData = "clustered_sampledata.csv";
 		if (argc > 2)
 			N = atoi(argv[2]);
-	}else
+	}else{
 		//fileData = "new_datasets/clustered_sampledata.csv";
+		// fileData = "new_datasets/clustered_sampledata.csv";
 		fileData = "new_datasets/clustered_sampledata.csv";
+		printf("using new datasetttt!!!");
+	}
 		
 	//Reads the file of dataset and stores it in vector
 	vvs datasetRaw = getData(fileData);
@@ -39,12 +43,16 @@ int main(int argc, char **argv) {
 	
 	//Get the number of vars
 	int numOfVars = dataset[0][0];
-	//cout << "Num of Vars:" << numOfVars << endl;
+	// cout << "Num of Vars:" << numOfVars << endl;
+
+	int indexOfClass = 7;
+
+	int indexOfCluster = 8;
 
 	//The KNN
 	int knn = 4;
 
-	vvd datasetSynthetic = prodModifAllCluster(dataset,N,numOfVars,knn);
+	vvd datasetSynthetic = prodModifAllCluster(dataset,N,numOfVars, indexOfClass, indexOfCluster,knn);
 	//cout << "DOOOOONNNNEEEE size :" << datasetSynthetic.size() << endl;
 	//printDatas(datasetSynthetic);
 	space;
